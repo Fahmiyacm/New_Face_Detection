@@ -1,0 +1,12 @@
+streamlit
+deepface
+tensorflow
+opencv-python-headless
+numpy
+Pillow
+matplotlib
+scikit-learn
+tqdm
+pandas
+retina-face
+mtcnn

@@ -1,0 +1,27 @@
+fdenv/
+venv/
+env/
+
+__pycache__/
+*.pyc
+# virtual environment
+fdenv/
+venv/
+env/
+
+# IDE files
+.idea/
+.vscode/
+
+# python cache
+__pycache__/
+*.pyc
+
+# dataset (optional)
+dataset/
+
+# temp files
+temp_upload.jpg
+dataset/
+
+temp_upload.jpg
