@@ -1,6 +1,7 @@
 streamlit
 deepface
-tensorflow
+tensorflow==2.19.0
+tf-keras
 opencv-python-headless
 numpy
 Pillow
