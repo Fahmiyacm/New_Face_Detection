@@ -8,7 +8,6 @@ from PIL import Image
 import pickle
 import tempfile
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from deepface import DeepFace
 
 # ---------------- CONFIG ----------------
@@ -26,16 +25,17 @@ def cosine_distance(a, b):
 
 @st.cache_resource
 def load_encodings():
-    # Change this path if your file name is different
-    with open("encodings\encodings.pkl", "rb") as f:
+    path = os.path.join("encodings", "encodings.pkl")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Missing encoding file: {path}")
+    with open(path, "rb") as f:
         return pickle.load(f)
 
 @st.cache_data
 def load_metrics():
-    # If you already have a saved evaluation.pkl, you can load it here.
-    # Otherwise this function can return None and metrics can be computed later.
-    if os.path.exists("evaluation_results1.pkl"):
-        with open("evaluation_results1.pkl", "rb") as f:
+    results_path = "evaluation_results1.pkl"
+    if os.path.exists(results_path):
+        with open(results_path, "rb") as f:
             return pickle.load(f)
     return None
 
@@ -103,7 +103,6 @@ if option == "Image Upload":
                             min_distance = distance
                             best_name = name
 
-                # Threshold can be tuned
                 threshold = 0.5
                 confidence = max(0.0, (1 - min_distance) * 100)
 
@@ -111,6 +110,7 @@ if option == "Image Upload":
                     area = face["facial_area"]
                     x, y, w, h = area["x"], area["y"], area["w"], area["h"]
                     color = (0, 255, 0) if min_distance < threshold else (255, 0, 0)
+
                     cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                     cv2.putText(
                         img,
@@ -146,7 +146,6 @@ elif option == "Model Metrics":
     st.subheader("📊 Model Metrics")
 
     if saved_metrics is not None:
-        # If you saved metrics in evaluation.pkl
         acc = saved_metrics.get("accuracy", 0)
         precision = saved_metrics.get("precision", 0)
         recall = saved_metrics.get("recall", 0)
@@ -167,7 +166,6 @@ elif option == "Model Metrics":
 
         fig, ax = plt.subplots(1, 2, figsize=(13, 5))
 
-        # Bar chart
         ax[0].bar(
             ["Accuracy", "Precision", "Recall", "F1"],
             [acc, precision, recall, f1],
@@ -177,32 +175,26 @@ elif option == "Model Metrics":
         ax[0].set_title("Model Performance")
         ax[0].grid(axis="y", linestyle="--", alpha=0.4)
 
-        # Accuracy curve
         if history and "accuracy" in history:
             epochs = list(range(1, len(history["accuracy"]) + 1))
             ax[1].plot(epochs, history["accuracy"], marker="o", label="Train Accuracy")
             if "val_accuracy" in history:
                 ax[1].plot(epochs, history["val_accuracy"], marker="x", label="Validation Accuracy")
-            ax[1].set_title("Accuracy vs Epochs")
-            ax[1].set_xlabel("Epoch")
-            ax[1].set_ylabel("Accuracy")
-            ax[1].grid(True, linestyle="--", alpha=0.4)
-            ax[1].legend()
         else:
             epochs = list(range(1, 11))
             simulated = [0.55 + i * 0.04 for i in range(10)]
             ax[1].plot(epochs, simulated, marker="o", label="Accuracy")
-            ax[1].set_title("Accuracy vs Epochs")
-            ax[1].set_xlabel("Epoch")
-            ax[1].set_ylabel("Accuracy")
-            ax[1].grid(True, linestyle="--", alpha=0.4)
-            ax[1].legend()
+
+        ax[1].set_title("Accuracy vs Epochs")
+        ax[1].set_xlabel("Epoch")
+        ax[1].set_ylabel("Accuracy")
+        ax[1].grid(True, linestyle="--", alpha=0.4)
+        ax[1].legend()
 
         st.pyplot(fig)
 
     else:
         st.warning("No saved evaluation metrics found.")
-
         st.info("You can still show a sample metrics chart below.")
 
         fig, ax = plt.subplots(1, 2, figsize=(13, 5))
