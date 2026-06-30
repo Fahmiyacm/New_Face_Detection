@@ -1,6 +1,4 @@
-fdenv/
-venv/
-env/
+
 
 __pycache__/
 *.pyc
@@ -22,6 +20,4 @@ dataset/
 
 # temp files
 temp_upload.jpg
-dataset/
 
-temp_upload.jpg
